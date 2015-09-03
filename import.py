@@ -24,7 +24,7 @@ def get_filepaths(directory):
     return file_paths  # Self-explanatory.
 
 # Run the above function and store its results in a variable.   
-
+# test
 def importFileinDB(fileName,IDSonda):
 
 	try:
@@ -53,14 +53,16 @@ def importFileinDB(fileName,IDSonda):
 				decimal_valore=0
 				#print "Could not convert string to a decimal." 		
 			if IDSonda > 0:
-				cursor.execute('INSERT INTO Sonda (IDSonda,VALORE_D,TimeStamp ) VALUES (%s, %s, %s )', (IDSonda,decimal_valore,datetime_timestamp))
-				con.commit()
+				if minuti %15 ==0:
+					cursor.execute('INSERT INTO Sonda (IDSonda,VALORE_D,TimeStamp ) VALUES (%s, %s, %s )', 
+(IDSonda,decimal_valore,datetime_timestamp))
+					con.commit()
 	except mdb.Error, e:
 		print "Error %d: %s" % (e.args[0],e.args[1])
 	finally:
 		if con:
-			cursor.execute('delete from Sonda where minute(timestamp) mod 15 <> 0;')
-			print "Pulizia record <> 15 minuti "
+#			cursor.execute('delete from Sonda where minute(timestamp) mod 15 <> 0;')
+#			print "Pulizia record <> 15 minuti "
 			con.commit()
 			cursor.close()
 			con.close()
