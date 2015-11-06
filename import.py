@@ -28,7 +28,7 @@ def get_filepaths(directory):
 def importFileinDB(fileName,IDSonda):
 
 	try:
-		con = mdb.connect(host='localhost', user='root',  passwd='pentagon51$', db='TRENDS')
+		con = mdb.connect(host='localhost', user='phpmyadmin',  passwd='8vBJnje06qQZ', db='TRENDS')
 		cursor = con.cursor()
 		print "Importazione dati da file: " + fileName + " sonda numero: " + IDSonda
 		csv_data = csv.reader(file(fileName),delimiter=';')
@@ -38,12 +38,11 @@ def importFileinDB(fileName,IDSonda):
 			anno=int(str_data[-4:])
 			mese=int(str_data[3:5])
 			giorno=int(str_data[:2])
-	
+
 			str_ora=row[1].strip()
 			secondi=int(str_ora[-2:])
 			minuti=int(str_ora[3:5])
 			ore=int(str_ora[:2])
-		
 			datetime_timestamp = datetime.datetime(anno,mese,giorno,ore,minuti,secondi)
 	#		print datetime_timestamp
 		    	str_valore=row[2].replace(",", ".").strip()
@@ -54,22 +53,22 @@ def importFileinDB(fileName,IDSonda):
 				#print "Could not convert string to a decimal." 		
 			if IDSonda > 0:
 				if minuti %15 ==0:
-					cursor.execute('INSERT INTO Sonda (IDSonda,VALORE_D,TimeStamp ) VALUES (%s, %s, %s )', 
+					cursor.execute('INSERT INTO ValoriSonda (IDSonda,VALORE_D,TimeStamp ) VALUES (%s, %s, %s )', 
 (IDSonda,decimal_valore,datetime_timestamp))
 					con.commit()
 	except mdb.Error, e:
 		print "Error %d: %s" % (e.args[0],e.args[1])
 	finally:
 		if con:
-#			cursor.execute('delete from Sonda where minute(timestamp) mod 15 <> 0;')
-#			print "Pulizia record <> 15 minuti "
+			cursor.execute('delete from ValoriSonda where minute(timestamp) mod 15 <> 0;')
+			print "Pulizia record <> 15 minuti "
 			con.commit()
 			cursor.close()
 			con.close()
 
 def main():
-	full_file_paths = get_filepaths("/datadrive/TRENDS")
-	file_path_importati= "/datadrive/IMPORTATI/"
+	full_file_paths = get_filepaths("/mnt/TRENDS/TODO")
+	file_path_importati= "/mnt/TRENDS/DELETEME/"
 	for file in full_file_paths:
 
 		if file.endswith(".CSV"):
@@ -79,6 +78,5 @@ def main():
 			idsonda = filename_no_extension[filename_no_extension.rfind('_')+1:len(filename_no_extension)]
 			#print idsonda
 			importFileinDB(file,idsonda)
-			os.rename(file, file_path_importati + filename + ".OK")
-			
+			os.rename(file, file_path_importati + filename )
 main()
